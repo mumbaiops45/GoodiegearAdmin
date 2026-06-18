@@ -9,9 +9,9 @@ import {
   ImageIcon,
   Ticket,
   BarChart3,
-  Settings,
+  Settings, 
   UserCircle,
-} from 'lucide-react'
+} from 'lucide-react'  
 
 // Single source of truth for sidebar navigation.
 // href uses Next.js path format (no 'to' — this is not React Router).
@@ -27,5 +27,5 @@ export const navItems = [
   // { href: '/admin/coupons',    label: 'Coupons',    icon: Ticket },
   { href: '/admin/reports',    label: 'Reports',    icon: BarChart3 },
   // { href: '/admin/settings',   label: 'Settings',   icon: Settings },
-  { href: '/admin/profile',    label: 'Profile',    icon: UserCircle },
+  { href: '/admin/profile', label: 'Profile',    icon: UserCircle },
 ]
