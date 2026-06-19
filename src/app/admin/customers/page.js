@@ -74,9 +74,9 @@ export default function CustomersPage() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50">
                 <th className="px-4 py-3">Customer</th>
-                <th className="px-4 py-3">Email</th>
-                <th className="px-4 py-3">Role</th>
-                <th className="px-4 py-3">Joined</th>
+                <th className="hidden px-4 py-3 sm:table-cell">Email</th>
+                <th className="hidden px-4 py-3 md:table-cell">Role</th>
+                <th className="hidden px-4 py-3 lg:table-cell">Joined</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -178,7 +178,7 @@ function CustomerRow({ customer, onDelete }) {
       </td>
 
       {/* Email */}
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 sm:table-cell">
         <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
           <Mail className="h-3.5 w-3.5 shrink-0" />
           {customer.email}
@@ -186,12 +186,12 @@ function CustomerRow({ customer, onDelete }) {
       </td>
 
       {/* Role */}
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 md:table-cell">
         <RoleBadge role={customer.role} />
       </td>
 
       {/* Joined */}
-      <td className="px-4 py-3 text-sm text-slate-500">{joined}</td>
+      <td className="hidden px-4 py-3 text-sm text-slate-500 lg:table-cell">{joined}</td>
 
       {/* Actions */}
       <td className="px-4 py-3">

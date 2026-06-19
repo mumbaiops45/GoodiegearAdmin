@@ -34,8 +34,7 @@ export function useProducts() {
   const logout = useAuthStore((s) => s.logout)
 
   // ── list state ───────────────────────────────────────────────
-  const [products,     setProducts]     = useState([])
-  const [total,        setTotal]        = useState(0)
+  const [allProducts,  setAllProducts]  = useState([])  // raw from API
   const [page,         setPage]         = useState(1)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('')
@@ -95,52 +94,48 @@ export function useProducts() {
     router.push('/admin/login')
   }, [logout, router])
 
-  // ── fetch ────────────────────────────────────────────────────
+  // ── fetch all products once ──────────────────────────────────
   const fetchProducts = useCallback(async () => {
     setFetching(true)
     setFetchError(null)
     try {
       const token = useAuthStore.getState().token
-      const data = await getProducts({
-        page, limit: LIMIT,
-        search, category: filterCat,
-        isActive: filterActive,
-      }, token)
+      const data = await getProducts({ page: 1, limit: 10000 }, token)
 
-      // Handle nested shape: { data: { products: [...], total: N } }
       const inner = (data.data && !Array.isArray(data.data)) ? data.data : data
-
       const list = (
         inner.products ??
         inner.items ??
         (Array.isArray(inner.data) ? inner.data : null) ??
         (Array.isArray(inner) ? inner : [])
       )
-
-      // Try every common field name backends use for total record count
-      const count = (
-        inner.total ??
-        inner.totalProducts ??
-        inner.totalCount ??
-        inner.totalItems ??
-        inner.pagination?.total ??
-        data.total ??
-        data.totalProducts ??
-        data.count ??
-        list.length
-      )
-
-      setProducts(list)
-      setTotal(count)
+      setAllProducts(list)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
       setFetchError(err.message)
     } finally {
       setFetching(false)
     }
-  }, [page, search, filterCat, filterActive, handleUnauthorized])
+  }, [handleUnauthorized])
 
   useEffect(() => { fetchProducts() }, [fetchProducts])
+
+  // ── client-side filter + paginate ────────────────────────────
+  const filtered = allProducts.filter((p) => {
+    const q = search.toLowerCase()
+    const matchSearch = !search ||
+      (p.title    ?? '').toLowerCase().includes(q) ||
+      (p.brand    ?? '').toLowerCase().includes(q) ||
+      (p.category ?? '').toLowerCase().includes(q)
+    const matchCat    = !filterCat    || p.category === filterCat
+    const matchActive = !filterActive || String(p.isActive) === filterActive
+    return matchSearch && matchCat && matchActive
+  })
+
+  const total      = filtered.length
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT))
+  const safePage   = Math.min(page, totalPages)
+  const products   = filtered.slice((safePage - 1) * LIMIT, safePage * LIMIT)
 
   // ── image file queue helpers ──────────────────────────────────
   const addImageFiles = useCallback((files) => {
@@ -280,10 +275,8 @@ export function useProducts() {
     return () => clearTimeout(t)
   }, [successMsg])
 
-  const totalPages = Math.max(1, Math.ceil(total / LIMIT))
-
   return {
-    products, total, totalPages, page, setPage,
+    products, total, totalPages, page: safePage, setPage,
     search, setSearch, filterCat, setFilterCat, filterActive, setFilterActive,
     isFetching, fetchError, categoryList, vendorList,
     modalOpen, openCreate, openEdit, closeModal,

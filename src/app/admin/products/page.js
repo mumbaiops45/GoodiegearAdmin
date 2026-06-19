@@ -93,11 +93,11 @@ export default function ProductsPage() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50">
                 <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Category</th>
+                <th className="hidden px-4 py-3 md:table-cell">Category</th>
                 <th className="px-4 py-3">Price</th>
                 <th className="px-4 py-3">Stock</th>
-                <th className="px-4 py-3">Rating</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="hidden px-4 py-3 lg:table-cell">Rating</th>
+                <th className="hidden px-4 py-3 sm:table-cell">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -226,7 +226,7 @@ function ProductRow({ product, onEdit, onDelete, onUpload }) {
       </td>
 
       {/* Category */}
-      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">{product.category}</td>
+      <td className="hidden px-4 py-3 text-sm text-slate-600 dark:text-slate-300 md:table-cell">{product.category}</td>
 
       {/* Price */}
       <td className="px-4 py-3">
@@ -250,7 +250,7 @@ function ProductRow({ product, onEdit, onDelete, onUpload }) {
       </td>
 
       {/* Rating */}
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 lg:table-cell">
         <div className="flex items-center gap-1">
           <Star className={`h-3.5 w-3.5 ${rating > 0 ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}`} />
           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -263,7 +263,7 @@ function ProductRow({ product, onEdit, onDelete, onUpload }) {
       </td>
 
       {/* Status (isActive) */}
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 sm:table-cell">
         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
           product.isActive
             ? 'bg-green-100 text-green-700'

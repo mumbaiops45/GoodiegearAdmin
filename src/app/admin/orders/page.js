@@ -83,7 +83,7 @@ export default function OrdersPage() {
       </div>
 
       {/* ── Search + payment filter ─────────────────────────────── */}
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <div className="relative flex-1 min-w-56">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -109,14 +109,14 @@ export default function OrdersPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                <th className="px-5 py-3 text-left">Order ID</th>
-                <th className="px-5 py-3 text-left">Customer</th>
-                <th className="px-5 py-3 text-center">Items</th>
-                <th className="px-5 py-3 text-right">Total</th>
-                <th className="px-5 py-3 text-center">Payment</th>
-                <th className="px-5 py-3 text-center">Status</th>
-                <th className="px-5 py-3 text-right">Date</th>
-                <th className="px-5 py-3 text-right">Actions</th>
+                <th className="px-4 py-3 text-left sm:px-5">Order ID</th>
+                <th className="px-4 py-3 text-left sm:px-5">Customer</th>
+                <th className="hidden px-5 py-3 text-center sm:table-cell">Items</th>
+                <th className="px-4 py-3 text-right sm:px-5">Total</th>
+                <th className="hidden px-5 py-3 text-center md:table-cell">Payment</th>
+                <th className="px-4 py-3 text-center sm:px-5">Status</th>
+                <th className="hidden px-5 py-3 text-right lg:table-cell">Date</th>
+                <th className="px-4 py-3 text-right sm:px-5">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -172,32 +172,32 @@ function OrderRow({ order, isUpdating, onView, onStatusChange }) {
 
   return (
     <tr className="transition-colors hover:bg-slate-50/60">
-      <td className="px-5 py-3.5">
+      <td className="px-4 py-3.5 sm:px-5">
         <span className="font-mono text-xs font-bold text-slate-700">{order.displayId}</span>
       </td>
 
-      <td className="px-5 py-3.5">
+      <td className="px-4 py-3.5 sm:px-5">
         <p className="font-semibold text-slate-800">{name}</p>
-        {email && <p className="text-xs text-slate-400">{email}</p>}
+        {email && <p className="hidden text-xs text-slate-400 sm:block">{email}</p>}
       </td>
 
-      <td className="px-5 py-3.5 text-center">
+      <td className="hidden px-5 py-3.5 text-center sm:table-cell">
         <span className="inline-flex items-center justify-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-700">
           {order.orderItems?.length ?? 0}
         </span>
       </td>
 
-      <td className="px-5 py-3.5 text-right font-bold text-slate-800">
+      <td className="px-4 py-3.5 text-right font-bold text-slate-800 sm:px-5">
         ₹{Number(order.totalPrice ?? 0).toLocaleString('en-IN')}
       </td>
 
-      <td className="px-5 py-3.5 text-center">
+      <td className="hidden px-5 py-3.5 text-center md:table-cell">
         <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${ps}`}>
           {order.paymentStatus}
         </span>
       </td>
 
-      <td className="px-5 py-3.5 text-center">
+      <td className="px-4 py-3.5 text-center sm:px-5">
         <StatusDropdown
           value={order.orderStatus}
           isUpdating={isUpdating}
@@ -205,9 +205,9 @@ function OrderRow({ order, isUpdating, onView, onStatusChange }) {
         />
       </td>
 
-      <td className="px-5 py-3.5 text-right text-xs text-slate-400">{date}</td>
+      <td className="hidden px-5 py-3.5 text-right text-xs text-slate-400 lg:table-cell">{date}</td>
 
-      <td className="px-5 py-3.5 text-right">
+      <td className="px-4 py-3.5 text-right sm:px-5">
         <button
           onClick={onView}
           className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"

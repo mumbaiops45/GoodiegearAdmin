@@ -71,6 +71,7 @@ export function useAdminProfile() {
       const p    = data.admin ?? data.user ?? data
       setProfile(p)
       setForm({ name: p.name ?? form.name })
+      useAuthStore.getState().updateUser(p)
       setPhotoFile(null)
       setPhotoPreview(null)
       setSuccessMsg('Profile updated successfully.')

@@ -79,8 +79,8 @@ export default function VendorsPage() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50">
                 <th className="px-4 py-3">Shop</th>
-                <th className="px-4 py-3">Owner</th>
-                <th className="px-4 py-3">Joined</th>
+                <th className="hidden px-4 py-3 sm:table-cell">Owner</th>
+                <th className="hidden px-4 py-3 lg:table-cell">Joined</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -175,13 +175,13 @@ function VendorRow({ vendor, isApproving, onApprove, onView }) {
       </td>
 
       {/* Owner */}
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 sm:table-cell">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{ownerName}</p>
         <p className="text-xs text-slate-400">{ownerEmail}</p>
       </td>
 
       {/* Joined */}
-      <td className="px-4 py-3 text-sm text-slate-500">{joined}</td>
+      <td className="hidden px-4 py-3 text-sm text-slate-500 lg:table-cell">{joined}</td>
 
       {/* Status */}
       <td className="px-4 py-3">

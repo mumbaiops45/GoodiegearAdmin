@@ -41,20 +41,20 @@ export default function DashboardPage() {
     <div className="space-y-6">
 
       {/* ── Top bar ───────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <p className="text-xs font-medium text-slate-400">{greeting} · {today}</p>
-          <h1 className="mt-0.5 text-2xl font-black text-slate-800">
+          <h1 className="mt-0.5 truncate text-xl font-black text-slate-800 sm:text-2xl">
             Welcome back, {user?.name ?? 'Admin'}
           </h1>
         </div>
         <button
           onClick={refetch}
           disabled={isFetching}
-          className="flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+          className="shrink-0 flex items-center gap-2 rounded-full bg-slate-800 px-3 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50 sm:px-4"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </button>
       </div>
 
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                     <div className="mb-3 inline-flex rounded-2xl bg-white/20 p-2">
                       <c.icon className="h-4 w-4 text-white" />
                     </div>
-                    <p className="text-2xl font-black text-white">{s.value}</p>
+                    <p className="text-xl font-black text-white sm:text-2xl">{s.value}</p>
                     <p className="mt-0.5 text-xs font-medium text-white/70">{s.label}</p>
                   </div>
                 </div>
@@ -170,10 +170,10 @@ export default function DashboardPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-y border-slate-50 bg-slate-50 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-                  <th className="px-6 py-2.5 text-left">Customer</th>
-                  <th className="px-6 py-2.5 text-left">Status</th>
-                  <th className="px-6 py-2.5 text-right">Amount</th>
-                  <th className="px-6 py-2.5 text-right">Date</th>
+                  <th className="px-4 py-2.5 text-left sm:px-6">Customer</th>
+                  <th className="px-4 py-2.5 text-left sm:px-6">Status</th>
+                  <th className="px-4 py-2.5 text-right sm:px-6">Amount</th>
+                  <th className="hidden px-6 py-2.5 text-right sm:table-cell">Date</th>
                 </tr>
               </thead>
               <tbody>
@@ -266,24 +266,24 @@ function OrderRow({ order }) {
 
   return (
     <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/60">
-      <td className="px-6 py-3">
-        <div className="flex items-center gap-3">
+      <td className="px-4 py-3 sm:px-6">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-pink-400 to-rose-500 text-[11px] font-bold text-white">
             {initials}
           </div>
           <div className="min-w-0">
-            <p className="truncate max-w-35 text-sm font-semibold text-slate-800">{name}</p>
-            {email && <p className="truncate max-w-35 text-[11px] text-slate-400">{email}</p>}
+            <p className="truncate max-w-25 text-sm font-semibold text-slate-800 sm:max-w-40">{name}</p>
+            {email && <p className="hidden truncate text-[11px] text-slate-400 sm:block">{email}</p>}
           </div>
         </div>
       </td>
-      <td className="px-6 py-3">
+      <td className="px-4 py-3 sm:px-6">
         <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${STATUS_META[status] ?? 'bg-slate-100 text-slate-500'}`}>
           {status}
         </span>
       </td>
-      <td className="px-6 py-3 text-right text-sm font-bold text-slate-800">{price}</td>
-      <td className="px-6 py-3 text-right text-xs text-slate-400">{date}</td>
+      <td className="px-4 py-3 text-right text-sm font-bold text-slate-800 sm:px-6">{price}</td>
+      <td className="hidden px-6 py-3 text-right text-xs text-slate-400 sm:table-cell">{date}</td>
     </tr>
   )
 }

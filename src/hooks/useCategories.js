@@ -26,6 +26,7 @@ export function useCategories() {
   const [categories,  setCategories]  = useState([])
   const [isFetching,  setFetching]    = useState(true)
   const [fetchError,  setFetchError]  = useState(null)
+  const [search,      setSearch]      = useState('')
 
   // ── modal / form state ───────────────────────────────────────
   const [modalOpen,    setModalOpen]    = useState(false)
@@ -171,8 +172,18 @@ export function useCategories() {
     return () => clearTimeout(t)
   }, [successMsg])
 
+  const filtered = categories.filter((cat) => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      (cat.name        ?? '').toLowerCase().includes(q) ||
+      (cat.description ?? '').toLowerCase().includes(q)
+    )
+  })
+
   return {
-    categories, isFetching, fetchError,
+    categories: filtered, allCategories: categories, isFetching, fetchError,
+    search, setSearch,
     modalOpen, openCreate, openEdit, closeModal,
     editTarget, formData, setFormData, handleImagePick,
     isSubmitting, formError, submitForm,

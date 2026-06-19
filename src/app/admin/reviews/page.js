@@ -83,10 +83,10 @@ export default function ReviewsPage() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-800 dark:bg-slate-800/50">
                 <th className="px-4 py-3">Product</th>
-                <th className="px-4 py-3">Customer</th>
+                <th className="hidden px-4 py-3 sm:table-cell">Customer</th>
                 <th className="px-4 py-3">Rating</th>
-                <th className="px-4 py-3">Comment</th>
-                <th className="px-4 py-3">Status</th>
+                <th className="hidden px-4 py-3 lg:table-cell">Comment</th>
+                <th className="hidden px-4 py-3 md:table-cell">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
@@ -158,11 +158,11 @@ function ReviewRow({ review, isBusy, onView, onApprove, onReject }) {
 
   return (
     <tr className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40">
-      <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-100 max-w-[160px] truncate">
+      <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-100 max-w-40 truncate">
         {productName}
       </td>
 
-      <td className="px-4 py-3 text-slate-600 dark:text-slate-300 max-w-[140px] truncate">
+      <td className="hidden px-4 py-3 text-slate-600 dark:text-slate-300 max-w-36 truncate sm:table-cell">
         {customerName}
       </td>
 
@@ -170,11 +170,11 @@ function ReviewRow({ review, isBusy, onView, onApprove, onReject }) {
         <StarRating value={rating} />
       </td>
 
-      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 max-w-[260px]">
+      <td className="hidden px-4 py-3 text-slate-500 dark:text-slate-400 max-w-64 lg:table-cell">
         <p className="truncate text-sm">{comment || <span className="italic opacity-50">No comment</span>}</p>
       </td>
 
-      <td className="px-4 py-3">
+      <td className="hidden px-4 py-3 md:table-cell">
         <StatusBadge status={status} />
       </td>
 

@@ -1,9 +1,4 @@
 'use client'
-
-// Reusable UI primitives — adapted from OJAIN ui.jsx.
-// All custom Tailwind classes (card, input, btn, badge, shadow-card) replaced
-// with explicit utility classes so there are zero external CSS dependencies.
-
 import { useEffect, useMemo, useState } from 'react'
 import { Search, X, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react'
 

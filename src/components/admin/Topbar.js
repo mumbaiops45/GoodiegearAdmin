@@ -36,22 +36,29 @@ export default function Topbar({ onMenu }) {
   const { user, signOut } = useAuth()
   const { choice, isDark, setTheme } = useTheme()
 
-  const [query,     setQuery]     = useState('')
-  const [bellOpen,  setBellOpen]  = useState(false)
-  const [unread,    setUnread]    = useState(true)
-  const [menuOpen,  setMenuOpen]  = useState(false)
-  const [themeOpen, setThemeOpen] = useState(false)
+  const [query,       setQuery]       = useState('')
+  const [searchOpen,  setSearchOpen]  = useState(false)
+  const [bellOpen,    setBellOpen]    = useState(false)
+  const [unread,      setUnread]      = useState(true)
+  const [menuOpen,    setMenuOpen]    = useState(false)
+  const [themeOpen,   setThemeOpen]   = useState(false)
 
-  const bellRef  = useRef(null)
-  const menuRef  = useRef(null)
-  const themeRef = useRef(null)
+  const bellRef   = useRef(null)
+  const menuRef   = useRef(null)
+  const themeRef  = useRef(null)
+  const searchRef = useRef(null)
+
+  const searchResults = query.trim()
+    ? navItems.filter((n) => n.label.toLowerCase().includes(query.trim().toLowerCase()))
+    : []
 
   // Close all dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (bellRef.current  && !bellRef.current.contains(e.target))  setBellOpen(false)
-      if (menuRef.current  && !menuRef.current.contains(e.target))  setMenuOpen(false)
-      if (themeRef.current && !themeRef.current.contains(e.target)) setThemeOpen(false)
+      if (bellRef.current   && !bellRef.current.contains(e.target))   setBellOpen(false)
+      if (menuRef.current   && !menuRef.current.contains(e.target))   setMenuOpen(false)
+      if (themeRef.current  && !themeRef.current.contains(e.target))  setThemeOpen(false)
+      if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
@@ -65,16 +72,19 @@ export default function Topbar({ onMenu }) {
 
   const submitSearch = (e) => {
     e.preventDefault()
-    const term = query.trim().toLowerCase()
-    if (!term) return
-    const match = navItems.find((n) => n.label.toLowerCase().includes(term))
-    if (match) {
-      router.push(match.href)
-      toast(`Showing ${match.label}`, 'info')
-    } else {
-      toast(`No results for "${query}"`, 'error')
+    if (searchResults.length > 0) {
+      navigateTo(searchResults[0])
+    } else if (query.trim()) {
+      toast(`No pages match "${query}"`, 'error')
+      setQuery('')
+      setSearchOpen(false)
     }
+  }
+
+  const navigateTo = (item) => {
+    router.push(item.href)
     setQuery('')
+    setSearchOpen(false)
   }
 
   const pickTheme = (value, label) => {
@@ -99,15 +109,42 @@ export default function Topbar({ onMenu }) {
       </button>
 
       {/* Search bar */}
-      <form onSubmit={submitSearch} className="relative hidden flex-1 max-w-md sm:block">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input
-          className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm outline-none transition focus:border-pink-400 focus:bg-white focus:ring-2 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
-          placeholder="Search pages…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-      </form>
+      <div ref={searchRef} className="relative hidden flex-1 max-w-md sm:block">
+        <form onSubmit={submitSearch}>
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm outline-none transition focus:border-pink-400 focus:bg-white focus:ring-2 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500"
+            placeholder="Search pages…"
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setSearchOpen(true) }}
+            onFocus={() => setSearchOpen(true)}
+            onKeyDown={(e) => e.key === 'Escape' && (setSearchOpen(false), setQuery(''))}
+          />
+        </form>
+
+        {/* Live results dropdown */}
+        {searchOpen && query.trim() && (
+          <div className="absolute left-0 right-0 top-full mt-1 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
+            {searchResults.length === 0 ? (
+              <p className="px-4 py-3 text-sm text-slate-400">No pages match "{query}"</p>
+            ) : (
+              searchResults.map((item) => {
+                const Icon = item.icon
+                return (
+                  <button
+                    key={item.href}
+                    onClick={() => navigateTo(item)}
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-pink-50 hover:text-pink-600 dark:text-slate-300 dark:hover:bg-pink-900/20 dark:hover:text-pink-400"
+                  >
+                    <Icon className="h-4 w-4 shrink-0 text-slate-400" />
+                    {item.label}
+                  </button>
+                )
+              })
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="ml-auto flex items-center gap-1 sm:gap-2">
         {/* Live clock */}
@@ -190,9 +227,17 @@ export default function Topbar({ onMenu }) {
             onClick={() => setMenuOpen((o) => !o)}
             className="flex items-center gap-2 rounded-lg px-1 py-1 hover:bg-slate-100 dark:hover:bg-slate-800"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 text-sm font-bold text-pink-600 dark:bg-pink-900/30 dark:text-pink-300">
-              {user?.name?.[0]?.toUpperCase() ?? 'A'}
-            </div>
+            {user?.profilePhoto ? (
+              <img
+                src={user.profilePhoto}
+                alt={user?.name ?? 'Admin'}
+                className="h-8 w-8 rounded-full object-cover ring-2 ring-pink-100 dark:ring-pink-900/40"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 text-sm font-bold text-pink-600 dark:bg-pink-900/30 dark:text-pink-300">
+                {user?.name?.[0]?.toUpperCase() ?? 'A'}
+              </div>
+            )}
             <div className="hidden text-left sm:block">
               <p className="text-sm font-semibold leading-none text-slate-800 dark:text-slate-100">
                 {user?.name ?? 'Admin User'}
@@ -216,12 +261,12 @@ export default function Topbar({ onMenu }) {
               >
                 <User className="h-4 w-4" /> Profile
               </button>
-              <button
+              {/* <button
                 onClick={() => { setMenuOpen(false); router.push('/admin/settings') }}
                 className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 <SettingsIcon className="h-4 w-4" /> Settings
-              </button>
+              </button> */}
               <button
                 onClick={handleSignOut}
                 className="flex w-full items-center gap-2.5 border-t border-slate-100 px-4 py-2.5 text-left text-sm text-rose-600 hover:bg-rose-50 dark:border-slate-800 dark:hover:bg-rose-950/40"

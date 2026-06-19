@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import {
   Plus, Pencil, Trash2, X, FolderOpen,
-  CheckCircle2, AlertCircle, Loader2, Camera, XCircle,
+  CheckCircle2, AlertCircle, Loader2, Camera, XCircle, Search,
 } from 'lucide-react'
 import { PageHeader, ConfirmDialog } from '@/components/ui'
 import { useCategories } from '@/hooks/useCategories'
@@ -13,18 +13,36 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <PageHeader
-        title="Categories"
-        subtitle={`${c.categories.length} categories`}
-        action={
+      {/* ── Header row ───────────────────────────────────────── */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Categories</h1>
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+            {c.categories.length} of {c.allCategories.length} categories
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Search */}
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              className="w-56 rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm outline-none transition focus:border-pink-400 focus:bg-white focus:ring-2 focus:ring-pink-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              placeholder="Search categories…"
+              value={c.search}
+              onChange={(e) => c.setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Add button */}
           <button
             onClick={c.openCreate}
             className="flex items-center gap-2 rounded-xl bg-linear-to-r from-pink-500 to-rose-500 px-4 py-2.5 text-sm font-bold text-white shadow-sm shadow-pink-200 hover:from-pink-600 hover:to-rose-600 transition"
           >
             <Plus className="h-4 w-4" /> Add Category
           </button>
-        }
-      />
+        </div>
+      </div>
 
       {/* Success banner */}
       {c.successMsg && (
@@ -54,13 +72,19 @@ export default function CategoriesPage() {
       ) : c.categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 dark:border-slate-700 dark:bg-slate-900">
           <FolderOpen className="h-12 w-12 text-slate-300" />
-          <p className="mt-3 text-sm text-slate-400">No categories yet. Add your first one.</p>
-          <button
-            onClick={c.openCreate}
-            className="mt-4 flex items-center gap-2 rounded-xl bg-pink-500 px-4 py-2 text-sm font-bold text-white hover:bg-pink-600"
-          >
-            <Plus className="h-4 w-4" /> Add Category
-          </button>
+          {c.search ? (
+            <p className="mt-3 text-sm text-slate-400">No categories match "{c.search}"</p>
+          ) : (
+            <>
+              <p className="mt-3 text-sm text-slate-400">No categories yet. Add your first one.</p>
+              <button
+                onClick={c.openCreate}
+                className="mt-4 flex items-center gap-2 rounded-xl bg-pink-500 px-4 py-2 text-sm font-bold text-white hover:bg-pink-600"
+              >
+                <Plus className="h-4 w-4" /> Add Category
+              </button>
+            </>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
