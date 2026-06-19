@@ -24,7 +24,7 @@ export const navItems = [
   { href: '/admin/vendors',    label: 'Vendors',    icon: Store },
   { href: '/admin/reviews',    label: 'Reviews',    icon: Star },
   { href: '/admin/banners',    label: 'Banners',    icon: ImageIcon },
-  // { href: '/admin/coupons',    label: 'Coupons',    icon: Ticket },
+  { href: '/admin/coupons',    label: 'Coupons',    icon: Ticket },
   { href: '/admin/reports',    label: 'Reports',    icon: BarChart3 },
   // { href: '/admin/settings',   label: 'Settings',   icon: Settings },
   { href: '/admin/profile', label: 'Profile',    icon: UserCircle },
