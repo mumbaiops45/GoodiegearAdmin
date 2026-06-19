@@ -50,7 +50,9 @@ export function useProducts() {
   const [formError,    setFormError]    = useState(null)
 
   // ── queued image files (selected inside the form before submit) ──
-  const [imageFiles, setImageFiles] = useState([]) // [{ id, file, preview }]
+  const [imageFiles,  setImageFiles]  = useState([]) // [{ id, file, preview }]
+  // ── existing images to keep during edit (user can remove) ────────
+  const [keptImages,  setKeptImages]  = useState([]) // string[] of URLs
 
   // ── delete state ─────────────────────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState(null)
@@ -160,10 +162,15 @@ export function useProducts() {
   }, [])
 
   // ── modal helpers ────────────────────────────────────────────
+  const removeKeptImage = useCallback((url) => {
+    setKeptImages((prev) => prev.filter((u) => u !== url))
+  }, [])
+
   const openCreate = () => {
     setEditTarget(null)
     setFormData(EMPTY_FORM)
     setFormError(null)
+    setKeptImages([])
     clearImageFiles()
     setModalOpen(true)
   }
@@ -183,6 +190,7 @@ export function useProducts() {
       isFeatured:    product.isFeatured    ?? false,
       isActive:      product.isActive      ?? true,
     })
+    setKeptImages(product.images ?? [])
     setFormError(null)
     clearImageFiles()
     setModalOpen(true)
@@ -190,6 +198,7 @@ export function useProducts() {
 
   const closeModal = () => {
     clearImageFiles()
+    setKeptImages([])
     setModalOpen(false)
     setEditTarget(null)
     setFormError(null)
@@ -213,6 +222,7 @@ export function useProducts() {
         age:           formData.age ? Number(formData.age) : 0,
         isFeatured:    formData.isFeatured,
         isActive:      formData.isActive,
+        ...(editTarget && { images: keptImages }),
       }
 
       let productId = editTarget?._id
@@ -241,7 +251,7 @@ export function useProducts() {
     } finally {
       setSubmitting(false)
     }
-  }, [formData, editTarget, imageFiles, fetchProducts, handleUnauthorized])
+  }, [formData, editTarget, imageFiles, keptImages, fetchProducts, handleUnauthorized])
 
   // ── delete ───────────────────────────────────────────────────
   const confirmDelete = useCallback(async () => {
@@ -282,6 +292,7 @@ export function useProducts() {
     modalOpen, openCreate, openEdit, closeModal,
     editTarget, formData, setFormData, isSubmitting, formError, submitForm,
     imageFiles, addImageFiles, removeImageFile,
+    keptImages, removeKeptImage,
     deleteTarget, setDeleteTarget, isDeleting, confirmDelete,
     uploadTarget, setUploadTarget, onUploadDone,
     successMsg,

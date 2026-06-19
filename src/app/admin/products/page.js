@@ -159,6 +159,8 @@ export default function ProductsPage() {
           imageFiles={p.imageFiles}
           addImageFiles={p.addImageFiles}
           removeImageFile={p.removeImageFile}
+          keptImages={p.keptImages}
+          removeKeptImage={p.removeKeptImage}
         />
       )}
 
@@ -293,7 +295,7 @@ function ProductRow({ product, onEdit, onDelete, onUpload }) {
 
 // ── Create / Edit Modal ───────────────────────────────────────────────────────
 
-function ProductModal({ editTarget, formData, setFormData, isSubmitting, formError, onSubmit, onClose, categoryList, vendorList, imageFiles, addImageFiles, removeImageFile }) {
+function ProductModal({ editTarget, formData, setFormData, isSubmitting, formError, onSubmit, onClose, categoryList, vendorList, imageFiles, addImageFiles, removeImageFile, keptImages, removeKeptImage }) {
   const set    = (key) => (e) => setFormData((prev) => ({ ...prev, [key]: e.target.value }))
   const toggle = (key) => () => setFormData((prev) => ({ ...prev, [key]: !prev[key] }))
 
@@ -405,7 +407,8 @@ function ProductModal({ editTarget, formData, setFormData, isSubmitting, formErr
         {/* Image upload section */}
         <div className="sm:col-span-2">
           <FormImageSection
-            existingImages={editTarget?.images ?? []}
+            keptImages={keptImages}
+            removeKeptImage={removeKeptImage}
             imageFiles={imageFiles}
             addImageFiles={addImageFiles}
             removeImageFile={removeImageFile}
@@ -437,10 +440,10 @@ function ProductModal({ editTarget, formData, setFormData, isSubmitting, formErr
 
 // ── Inline image upload section (inside the create/edit form) ────────────────
 
-function FormImageSection({ existingImages, imageFiles, addImageFiles, removeImageFile }) {
+function FormImageSection({ keptImages, removeKeptImage, imageFiles, addImageFiles, removeImageFile }) {
   const fileRef = useRef(null)
 
-  const hasAny = existingImages.length > 0 || imageFiles.length > 0
+  const hasAny = keptImages.length > 0 || imageFiles.length > 0
 
   return (
     <div>
@@ -451,10 +454,19 @@ function FormImageSection({ existingImages, imageFiles, addImageFiles, removeIma
       {/* Thumbnail grid */}
       {hasAny && (
         <div className="mb-3 flex flex-wrap gap-2">
-          {/* Existing images (read-only) */}
-          {existingImages.map((url, i) => (
-            <div key={`existing-${i}`} className="relative h-16 w-16 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700">
+          {/* Existing saved images — removable */}
+          {keptImages.map((url, i) => (
+            <div key={`kept-${i}`} className="group relative h-16 w-16 overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700">
               <img src={url} alt={`img-${i}`} className="h-full w-full object-cover" />
+              {removeKeptImage && (
+                <button
+                  type="button"
+                  onClick={() => removeKeptImage(url)}
+                  className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white/90 text-red-500 opacity-0 shadow transition group-hover:opacity-100"
+                >
+                  <XCircle className="h-4 w-4" />
+                </button>
+              )}
               <span className="absolute bottom-0 left-0 right-0 bg-black/40 py-0.5 text-center text-[9px] text-white">saved</span>
             </div>
           ))}
