@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { getAllReviews, approveReview, rejectReview } from '@/services/reviewService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useReviews() {
   const router = useRouter()
@@ -34,7 +35,7 @@ export function useReviews() {
       setReviews(list)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -51,7 +52,7 @@ export function useReviews() {
       fetchReviews()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setActionId(null)
     }
@@ -66,7 +67,7 @@ export function useReviews() {
       fetchReviews()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setActionId(null)
     }

@@ -12,6 +12,7 @@ import {
 } from '@/services/productService'
 import { getCategories } from '@/services/categoryService'
 import { getAllVendors } from '@/services/vendorService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 const LIMIT = 10
 
@@ -114,7 +115,7 @@ export function useProducts() {
       setAllProducts(list)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -206,6 +207,14 @@ export function useProducts() {
 
   // ── submit (create or update, then upload queued images) ──────
   const submitForm = useCallback(async () => {
+    // Client-side validation
+    if (!formData.vendor)               { setFormError('Please select a vendor.'); return }
+    if (!formData.title.trim())         { setFormError('Product title is required.'); return }
+    if (!formData.description.trim())   { setFormError('Product description is required.'); return }
+    if (formData.price === '' || Number(formData.price) <= 0) { setFormError('Please enter a valid price greater than 0.'); return }
+    if (formData.stock === '' || Number(formData.stock) < 0)  { setFormError('Stock quantity cannot be negative.'); return }
+    if (!formData.category)             { setFormError('Please select a category.'); return }
+
     const token = useAuthStore.getState().token
     setSubmitting(true)
     setFormError(null)
@@ -247,7 +256,7 @@ export function useProducts() {
       fetchProducts()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFormError(err.message)
+      setFormError(getErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -265,7 +274,7 @@ export function useProducts() {
       fetchProducts()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setDeleting(false)
     }

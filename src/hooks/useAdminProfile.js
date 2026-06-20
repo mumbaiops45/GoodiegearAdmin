@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { getAdminProfile, updateAdminProfile } from '@/services/adminProfileService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useAdminProfile() {
   const router = useRouter()
@@ -38,7 +39,7 @@ export function useAdminProfile() {
       setForm({ name: p.name ?? '' })
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -60,6 +61,8 @@ export function useAdminProfile() {
   }
 
   const handleSave = useCallback(async () => {
+    if (!form.name.trim()) { setSaveError('Name is required.'); return }
+
     const token = useAuthStore.getState().token
     setSaving(true)
     setSaveError(null)
@@ -77,7 +80,7 @@ export function useAdminProfile() {
       setSuccessMsg('Profile updated successfully.')
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setSaveError(err.message)
+      setSaveError(getErrorMessage(err))
     } finally {
       setSaving(false)
     }

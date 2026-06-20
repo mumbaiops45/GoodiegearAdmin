@@ -4,6 +4,7 @@ import { useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { loginAdmin, logoutAdmin } from '@/services/authService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useAuth() {
   const router = useRouter()
@@ -19,7 +20,7 @@ export function useAuth() {
         setAuth(data.user, data.token)
         router.push('/admin/dashboard')
       } catch (err) {
-        setError(err.message)
+        setError(getErrorMessage(err))
       }
     },
     [setLoading, clearError, setAuth, setError, router]

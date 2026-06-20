@@ -48,7 +48,7 @@ export async function loginAdmin({ email, password }) {
 
   if (!token) {
     console.error('[loginAdmin] No token found in response. Keys received:', Object.keys(data))
-    throw new Error('Login succeeded but no token was returned. Check your backend response.')
+    throw new Error('Login failed. Please try again or contact support.')
   }
 
   return { user, token }

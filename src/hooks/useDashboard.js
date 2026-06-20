@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { getDashboardStats, getDashboardOverview } from '@/services/dashboardService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useDashboard() {
   const router = useRouter()
@@ -27,7 +28,7 @@ export function useDashboard() {
       setOverview(overviewRes.data ?? null)
     } catch (err) {
       if (err.status === 401) { logout(); router.push('/admin/login'); return }
-      setError(err.message)
+      setError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }

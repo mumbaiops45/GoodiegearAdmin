@@ -10,6 +10,7 @@ import {
   deleteBanner,
   toggleBanner,
 } from '@/services/bannerService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 const EMPTY_FORM = {
   title:     '',
@@ -53,7 +54,7 @@ export function useBanners() {
       const list = data.banners ?? data.data ?? (Array.isArray(data) ? data : [])
       setBanners(list)
     } catch (err) {
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -129,7 +130,7 @@ export function useBanners() {
       fetchBanners()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFormError(err.message)
+      setFormError(getErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -146,7 +147,7 @@ export function useBanners() {
       fetchBanners()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -162,7 +163,7 @@ export function useBanners() {
       fetchBanners()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setTogglingId(null)
     }

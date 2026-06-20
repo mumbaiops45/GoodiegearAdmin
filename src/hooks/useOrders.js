@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { getAllOrders, updateOrderStatus } from '@/services/orderService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useOrders() {
   const router = useRouter()
@@ -39,7 +40,7 @@ export function useOrders() {
       setOrders(withIds.reverse()) // latest first in display
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -66,7 +67,7 @@ export function useOrders() {
       setDetailOrder(null)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setUpdateError(err.message)
+      setUpdateError(getErrorMessage(err))
     } finally {
       setUpdatingId(null)
     }

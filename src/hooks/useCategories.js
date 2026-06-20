@@ -9,6 +9,7 @@ import {
   updateCategory,
   deleteCategory,
 } from '@/services/categoryService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 const EMPTY_FORM = {
   name:         '',
@@ -57,7 +58,7 @@ export function useCategories() {
       setCategories(list)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -116,6 +117,8 @@ export function useCategories() {
 
   // ── submit ───────────────────────────────────────────────────
   const submitForm = useCallback(async () => {
+    if (!formData.name.trim()) { setFormError('Category name is required.'); return }
+
     const token = useAuthStore.getState().token
     setSubmitting(true)
     setFormError(null)
@@ -141,7 +144,7 @@ export function useCategories() {
       fetchCategories()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFormError(err.message)
+      setFormError(getErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -159,7 +162,7 @@ export function useCategories() {
       fetchCategories()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setDeleting(false)
     }

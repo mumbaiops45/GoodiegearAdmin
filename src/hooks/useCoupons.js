@@ -10,6 +10,7 @@ import {
   deleteCoupon,
   toggleCoupon,
 } from '@/services/couponService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 const EMPTY_FORM = {
   code:         '',
@@ -72,7 +73,7 @@ export function useCoupons() {
       setCoupons(list)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -163,7 +164,7 @@ export function useCoupons() {
       fetchCoupons()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFormError(err.message)
+      setFormError(getErrorMessage(err))
     } finally {
       setSubmitting(false)
     }
@@ -180,7 +181,7 @@ export function useCoupons() {
       fetchCoupons()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setDeleting(false)
       setDeleteTarget(null)
@@ -196,7 +197,7 @@ export function useCoupons() {
       fetchCoupons()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setTogglingId(null)
     }

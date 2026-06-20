@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { getAdminProfile, updateAdminProfile } from '@/services/profileService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useProfile() {
   const router     = useRouter()
@@ -48,7 +49,7 @@ export function useProfile() {
       } catch (err) {
         if (cancelled) return
         if (err.status === 401) { handleUnauthorized(); return }
-        setError(err.message)
+        setError(getErrorMessage(err))
       } finally {
         if (!cancelled) setFetching(false)
       }
@@ -76,8 +77,9 @@ export function useProfile() {
         return { ok: true, message: msg }
       } catch (err) {
         if (err.status === 401) { handleUnauthorized(); return { ok: false, message: 'Session expired' } }
-        setError(err.message)
-        return { ok: false, message: err.message }
+        const msg = getErrorMessage(err)
+        setError(msg)
+        return { ok: false, message: msg }
       } finally {
         setUpdating(false)
       }

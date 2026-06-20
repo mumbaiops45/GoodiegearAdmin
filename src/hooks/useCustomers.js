@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/authStore'
 import { getAllCustomers, deleteUser } from '@/services/customerService'
+import { getErrorMessage } from '@/utils/getErrorMessage'
 
 export function useCustomers() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export function useCustomers() {
       setCustomers(list)
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setFetching(false)
     }
@@ -54,7 +55,7 @@ export function useCustomers() {
       fetchCustomers()
     } catch (err) {
       if (err.status === 401) { handleUnauthorized(); return }
-      setFetchError(err.message)
+      setFetchError(getErrorMessage(err))
     } finally {
       setDeleting(false)
     }

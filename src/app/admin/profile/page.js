@@ -169,6 +169,9 @@ function InfoForm({ profile, isUpdating, onUpdate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!name.trim())  { setStatus({ type: 'error', message: 'Full name is required.' }); return }
+    if (!email.trim()) { setStatus({ type: 'error', message: 'Email address is required.' }); return }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setStatus({ type: 'error', message: 'Please enter a valid email address.' }); return }
     const result = await onUpdate({ name, email })
     setStatus(result?.ok
       ? { type: 'success', message: result.message }
@@ -207,6 +210,8 @@ function PasswordForm({ isUpdating, onUpdate }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!password) { setStatus({ type: 'error', message: 'New password is required.' }); return }
+    if (password.length < 8) { setStatus({ type: 'error', message: 'Password must be at least 8 characters.' }); return }
     if (password !== confirm) { setMismatch(true); return }
     setMismatch(false)
     const result = await onUpdate({ password })
