@@ -1,4 +1,8 @@
-import LoginForm from '@/components/admin/LoginForm'
+import LoginForm from '@/components/admin/LoginForm';
+import {
+  Mail,
+  LockKeyhole,
+} from "lucide-react";
 
 export const metadata = {
   title: 'Admin Login — GoodieGear',
