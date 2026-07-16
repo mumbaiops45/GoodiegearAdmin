@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useLoginForm } from '@/hooks/useLoginForm'
 
@@ -7,6 +9,9 @@ export default function LoginForm() {
   const { login, isLoading, error, clearError } = useAuth()
   const { fields, fieldErrors, touched, handleChange, handleBlur, handleSubmit } =
     useLoginForm(login)
+
+  // ── Password visibility toggle ──
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
@@ -65,7 +70,7 @@ export default function LoginForm() {
         )}
       </div>
 
-      {/* Password */}
+      {/* ── Password with Show/Hide Toggle ── */}
       <div>
         <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-gray-700">
           Password
@@ -79,7 +84,7 @@ export default function LoginForm() {
           <input
             id="password"
             name="password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
             value={fields.password}
             onChange={handleChange}
@@ -87,13 +92,23 @@ export default function LoginForm() {
             disabled={isLoading}
             placeholder="••••••••"
             className={[
-              'w-full rounded-xl border py-3 pl-10 pr-4 text-sm text-gray-800 outline-none transition placeholder:text-gray-300',
+              'w-full rounded-xl border py-3 pl-10 pr-12 text-sm text-gray-800 outline-none transition placeholder:text-gray-300',
               'focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-50',
               touched.password && fieldErrors.password
                 ? 'border-red-300 bg-red-50/30 focus:ring-red-100'
                 : 'border-gray-200 bg-gray-50/60 focus:border-pink-400 focus:bg-white focus:ring-pink-100',
             ].join(' ')}
           />
+          {/* Toggle button */}
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            tabIndex={-1}  // prevents focus interruption
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
         </div>
         {touched.password && fieldErrors.password && (
           <p className="mt-1.5 flex items-center gap-1 text-xs text-red-500">
