@@ -17,17 +17,21 @@ import { getErrorMessage } from '@/utils/getErrorMessage'
 const LIMIT = 10
 
 const EMPTY_FORM = {
-  vendor:        '',
-  title:         '',
-  description:   '',
-  price:         '',
+  vendor: '',
+  title: '',
+  description: '',
+  price: '',
   discountPrice: '',
-  stock:         '',
-  category:      '',
-  brand:         '',
-  age:           '',
-  isFeatured:    false,
-  isActive:      true,
+  stock: '',
+  category: '',
+  brand: '',
+  age: '',
+  isFeatured: false,
+  isActive: true,
+  isDealOfTheDay: false,
+  dealPrice: '',
+  dealStartDate: '',
+  dealEndDate: '',
 }
 
 export function useProducts() {
@@ -35,29 +39,29 @@ export function useProducts() {
   const logout = useAuthStore((s) => s.logout)
 
   // ── list state ───────────────────────────────────────────────
-  const [allProducts,  setAllProducts]  = useState([])  // raw from API
-  const [page,         setPage]         = useState(1)
-  const [search,       setSearch]       = useState('')
-  const [filterCat,    setFilterCat]    = useState('')
+  const [allProducts, setAllProducts] = useState([])  // raw from API
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [filterCat, setFilterCat] = useState('')
   const [filterActive, setFilterActive] = useState('')
-  const [isFetching,   setFetching]     = useState(true)
-  const [fetchError,   setFetchError]   = useState(null)
+  const [isFetching, setFetching] = useState(true)
+  const [fetchError, setFetchError] = useState(null)
 
   // ── modal / form state ───────────────────────────────────────
-  const [modalOpen,    setModalOpen]    = useState(false)
-  const [editTarget,   setEditTarget]   = useState(null)
-  const [formData,     setFormData]     = useState(EMPTY_FORM)
-  const [isSubmitting, setSubmitting]   = useState(false)
-  const [formError,    setFormError]    = useState(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState(null)
+  const [formData, setFormData] = useState(EMPTY_FORM)
+  const [isSubmitting, setSubmitting] = useState(false)
+  const [formError, setFormError] = useState(null)
 
   // ── queued image files (selected inside the form before submit) ──
-  const [imageFiles,  setImageFiles]  = useState([]) // [{ id, file, preview }]
+  const [imageFiles, setImageFiles] = useState([]) // [{ id, file, preview }]
   // ── existing images to keep during edit (user can remove) ────────
-  const [keptImages,  setKeptImages]  = useState([]) // string[] of URLs
+  const [keptImages, setKeptImages] = useState([]) // string[] of URLs
 
   // ── delete state ─────────────────────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [isDeleting,   setDeleting]     = useState(false)
+  const [isDeleting, setDeleting] = useState(false)
 
   // ── standalone upload modal ───────────────────────────────────
   const [uploadTarget, setUploadTarget] = useState(null)
@@ -71,7 +75,7 @@ export function useProducts() {
         const list = data.categories ?? data.data ?? (Array.isArray(data) ? data : [])
         setCategoryList(list)
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   // ── vendor list (for product form dropdown) ───────────────────
@@ -86,7 +90,7 @@ export function useProducts() {
         const approved = list.filter((v) => v.isApproved === true)
         setVendorList(approved)
       })
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   // ── success toast ────────────────────────────────────────────
@@ -127,23 +131,23 @@ export function useProducts() {
   const filtered = allProducts.filter((p) => {
     const q = search.toLowerCase()
     const matchSearch = !search ||
-      (p.title    ?? '').toLowerCase().includes(q) ||
-      (p.brand    ?? '').toLowerCase().includes(q) ||
+      (p.title ?? '').toLowerCase().includes(q) ||
+      (p.brand ?? '').toLowerCase().includes(q) ||
       (p.category ?? '').toLowerCase().includes(q)
-    const matchCat    = !filterCat    || p.category === filterCat
+    const matchCat = !filterCat || p.category === filterCat
     const matchActive = !filterActive || String(p.isActive) === filterActive
     return matchSearch && matchCat && matchActive
   })
 
-  const total      = filtered.length
+  const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / LIMIT))
-  const safePage   = Math.min(page, totalPages)
-  const products   = filtered.slice((safePage - 1) * LIMIT, safePage * LIMIT)
+  const safePage = Math.min(page, totalPages)
+  const products = filtered.slice((safePage - 1) * LIMIT, safePage * LIMIT)
 
   // ── image file queue helpers ──────────────────────────────────
   const addImageFiles = useCallback((files) => {
     const items = Array.from(files).map((file) => ({
-      id:      Math.random().toString(36).slice(2),
+      id: Math.random().toString(36).slice(2),
       file,
       preview: URL.createObjectURL(file),
     }))
@@ -179,17 +183,25 @@ export function useProducts() {
   const openEdit = (product) => {
     setEditTarget(product)
     setFormData({
-      vendor:        product.vendor?._id ?? product.vendor ?? '',
-      title:         product.title         ?? '',
-      description:   product.description   ?? '',
-      price:         product.price         ?? '',
-      discountPrice: product.discountPrice  ?? '',
-      stock:         product.stock         ?? '',
-      category:      product.category      ?? '',
-      brand:         product.brand         ?? '',
-      age:           product.age           ?? '',
-      isFeatured:    product.isFeatured    ?? false,
-      isActive:      product.isActive      ?? true,
+      vendor: product.vendor?._id ?? product.vendor ?? '',
+      title: product.title ?? '',
+      description: product.description ?? '',
+      price: product.price ?? '',
+      discountPrice: product.discountPrice ?? '',
+      stock: product.stock ?? '',
+      category: product.category ?? '',
+      brand: product.brand ?? '',
+      age: product.age ?? '',
+      isFeatured: product.isFeatured ?? false,
+      isActive: product.isActive ?? true,
+      isDealOfTheDay: product.isDealOfTheDay ?? false,
+      dealPrice: product.dealPrice ?? '',
+      dealStartDate: product.dealStartDate
+        ? product.dealStartDate.split('T')[0]
+        : '',
+      dealEndDate: product.dealEndDate
+        ? product.dealEndDate.split('T')[0]
+        : '',
     })
     setKeptImages(product.images ?? [])
     setFormError(null)
@@ -208,32 +220,44 @@ export function useProducts() {
   // ── submit (create or update, then upload queued images) ──────
   const submitForm = useCallback(async () => {
     // Client-side validation
-    if (!formData.vendor)               { setFormError('Please select a vendor.'); return }
-    if (!formData.title.trim())         { setFormError('Product title is required.'); return }
-    if (!formData.description.trim())   { setFormError('Product description is required.'); return }
+    if (!formData.vendor) { setFormError('Please select a vendor.'); return }
+    if (!formData.title.trim()) { setFormError('Product title is required.'); return }
+    if (!formData.description.trim()) { setFormError('Product description is required.'); return }
     if (formData.price === '' || Number(formData.price) <= 0) { setFormError('Please enter a valid price greater than 0.'); return }
-    if (formData.stock === '' || Number(formData.stock) < 0)  { setFormError('Stock quantity cannot be negative.'); return }
-    if (!formData.category)             { setFormError('Please select a category.'); return }
+    if (formData.stock === '' || Number(formData.stock) < 0) { setFormError('Stock quantity cannot be negative.'); return }
+    if (!formData.category) { setFormError('Please select a category.'); return }
 
     const token = useAuthStore.getState().token
     setSubmitting(true)
     setFormError(null)
     try {
       const payload = {
-        vendor:        formData.vendor,
-        title:         formData.title,
-        description:   formData.description,
-        price:         Number(formData.price),
+        vendor: formData.vendor,
+        title: formData.title,
+        description: formData.description,
+        price: Number(formData.price),
         discountPrice: formData.discountPrice ? Number(formData.discountPrice) : 0,
-        stock:         Number(formData.stock),
-        category:      formData.category,
-        brand:         formData.brand,
-        age:           formData.age ? Number(formData.age) : 0,
-        isFeatured:    formData.isFeatured,
-        isActive:      formData.isActive,
+        stock: Number(formData.stock),
+        category: formData.category,
+        brand: formData.brand,
+        age: formData.age ? Number(formData.age) : 0,
+
+        isFeatured: formData.isFeatured,
+        isActive: formData.isActive,
+
+        isDealOfTheDay: formData.isDealOfTheDay,
+        dealPrice: formData.isDealOfTheDay
+          ? Number(formData.dealPrice || 0)
+          : 0,
+        dealStartDate: formData.isDealOfTheDay
+          ? formData.dealStartDate || null
+          : null,
+        dealEndDate: formData.isDealOfTheDay
+          ? formData.dealEndDate || null
+          : null,
+
         ...(editTarget && { images: keptImages }),
       }
-
       let productId = editTarget?._id
 
       if (editTarget) {

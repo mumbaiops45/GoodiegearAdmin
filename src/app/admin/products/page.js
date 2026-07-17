@@ -1731,10 +1731,10 @@ export default function ProductsPage() {
       Number(prod.numReviews || 0),
       prod.createdAt
         ? new Date(prod.createdAt).toLocaleDateString('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          })
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        })
         : '',
     ])
 
@@ -1749,7 +1749,7 @@ export default function ProductsPage() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = `products_export_${new Date().toISOString().slice(0,10)}.csv`
+    link.download = `products_export_${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
     URL.revokeObjectURL(link.href)
   }
@@ -1947,11 +1947,11 @@ export default function ProductsPage() {
 // ─── Product Row ─────────────────────────────────────────────────────────────
 
 function ProductRow({ product, onEdit, onDelete, onUpload }) {
-  const image         = product.images?.[0] ?? null
-  const price         = Number(product.price ?? 0)
+  const image = product.images?.[0] ?? null
+  const price = Number(product.price ?? 0)
   const discountPrice = Number(product.discountPrice ?? 0)
-  const stock         = Number(product.stock ?? 0)
-  const rating        = Number(product.rating ?? 0)
+  const stock = Number(product.stock ?? 0)
+  const rating = Number(product.rating ?? 0)
 
   return (
     <tr className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40">
@@ -1994,13 +1994,12 @@ function ProductRow({ product, onEdit, onDelete, onUpload }) {
       </td>
 
       <td className="px-4 py-3">
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-          stock === 0
-            ? 'bg-red-100 text-red-700'
-            : stock < 10
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${stock === 0
+          ? 'bg-red-100 text-red-700'
+          : stock < 10
             ? 'bg-amber-100 text-amber-700'
             : 'bg-emerald-100 text-emerald-700'
-        }`}>
+          }`}>
           {stock === 0 ? 'Out of stock' : stock < 10 ? `Low · ${stock}` : stock}
         </span>
       </td>
@@ -2018,11 +2017,10 @@ function ProductRow({ product, onEdit, onDelete, onUpload }) {
       </td>
 
       <td className="hidden px-4 py-3 sm:table-cell">
-        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-          product.isActive
-            ? 'bg-green-100 text-green-700'
-            : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
-        }`}>
+        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${product.isActive
+          ? 'bg-green-100 text-green-700'
+          : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+          }`}>
           {product.isActive ? 'Active' : 'Inactive'}
         </span>
       </td>
@@ -2152,6 +2150,39 @@ function ProductModal({
           <FormLabel>Age (Sports field)</FormLabel>
           <FormInput type="number" min="0" value={formData.age} onChange={set('age')} placeholder="0" />
         </div>
+        {/* /* Deal Of The Day Fields */} 
+        {formData.isDealOfTheDay && (
+          <>
+            <div>
+              <FormLabel>Deal Price (₹)</FormLabel>
+              <FormInput
+                type="number"
+                min="0"
+                value={formData.dealPrice}
+                onChange={set("dealPrice")}
+                placeholder="Enter deal price"
+              />
+            </div>
+
+            <div>
+              <FormLabel>Deal Start Date</FormLabel>
+              <FormInput
+                type="date"
+                value={formData.dealStartDate}
+                onChange={set("dealStartDate")}
+              />
+            </div>
+
+            <div>
+              <FormLabel>Deal End Date</FormLabel>
+              <FormInput
+                type="date"
+                value={formData.dealEndDate}
+                onChange={set("dealEndDate")}
+              />
+            </div>
+          </>
+        )}
 
         <div className="sm:col-span-2 flex flex-wrap gap-6 pt-1">
           <Toggle
@@ -2165,6 +2196,12 @@ function ProductModal({
             onChange={toggle('isFeatured')}
             label="Featured"
             description="Show on homepage / featured section"
+          />
+          <Toggle
+            checked={formData.isDealOfTheDay}
+            onChange={toggle("isDealOfTheDay")}
+            label="Deal of the Day"
+            description="Show this product on the Deal of the Day section"
           />
         </div>
 
@@ -2276,21 +2313,21 @@ function FormImageSection({ keptImages, removeKeptImage, imageFiles, addImageFil
 // ─── Image Upload Modal ─────────────────────────────────────────────────────
 
 function ImageUploadModal({ productId, onDone, onClose }) {
-  const fileRef   = useRef(null)
-  const [files,   setFiles]   = useState([]) // { id, file, preview, status, error }
-  const [busy,    setBusy]    = useState(false)
+  const fileRef = useRef(null)
+  const [files, setFiles] = useState([]) // { id, file, preview, status, error }
+  const [busy, setBusy] = useState(false)
   const [doneCount, setDoneCount] = useState(0)
 
   const pendingFiles = files.filter((f) => f.status === 'pending')
-  const allDone      = files.length > 0 && files.every((f) => f.status === 'done' || f.status === 'error')
+  const allDone = files.length > 0 && files.every((f) => f.status === 'done' || f.status === 'error')
 
   const addFiles = (picked) => {
     const next = Array.from(picked).map((file) => ({
-      id:      Math.random().toString(36).slice(2),
+      id: Math.random().toString(36).slice(2),
       file,
       preview: URL.createObjectURL(file),
-      status:  'pending', // pending | uploading | done | error
-      error:   null,
+      status: 'pending', // pending | uploading | done | error
+      error: null,
     }))
     setFiles((prev) => [...prev, ...next])
   }
@@ -2304,7 +2341,7 @@ function ImageUploadModal({ productId, onDone, onClose }) {
   }
 
   const uploadAll = async () => {
-    const token   = useAuthStore.getState().token
+    const token = useAuthStore.getState().token
     const toUpload = files.filter((f) => f.status === 'pending')
     if (!toUpload.length) return
     setBusy(true)
@@ -2333,8 +2370,8 @@ function ImageUploadModal({ productId, onDone, onClose }) {
 
   const statusIcon = (f) => {
     if (f.status === 'uploading') return <Loader2 className="h-4 w-4 animate-spin text-pink-500" />
-    if (f.status === 'done')     return <CheckCircle2 className="h-4 w-4 text-green-500" />
-    if (f.status === 'error')    return <AlertCircle  className="h-4 w-4 text-red-500" />
+    if (f.status === 'done') return <CheckCircle2 className="h-4 w-4 text-green-500" />
+    if (f.status === 'error') return <AlertCircle className="h-4 w-4 text-red-500" />
     return null
   }
 
@@ -2371,9 +2408,8 @@ function ImageUploadModal({ productId, onDone, onClose }) {
               <div key={f.id} className="group relative aspect-square overflow-hidden rounded-xl border border-slate-200 bg-slate-100 dark:border-slate-700">
                 <img src={f.preview} alt={f.file.name} className="h-full w-full object-cover" />
 
-                <div className={`absolute inset-0 flex items-center justify-center transition ${
-                  f.status !== 'pending' ? 'bg-black/30' : 'bg-transparent group-hover:bg-black/10'
-                }`}>
+                <div className={`absolute inset-0 flex items-center justify-center transition ${f.status !== 'pending' ? 'bg-black/30' : 'bg-transparent group-hover:bg-black/10'
+                  }`}>
                   {statusIcon(f)}
                 </div>
 
@@ -2416,8 +2452,8 @@ function ImageUploadModal({ productId, onDone, onClose }) {
           {busy
             ? 'Uploading…'
             : pendingFiles.length > 0
-            ? `Upload ${pendingFiles.length} Image${pendingFiles.length !== 1 ? 's' : ''}`
-            : 'All Uploaded'}
+              ? `Upload ${pendingFiles.length} Image${pendingFiles.length !== 1 ? 's' : ''}`
+              : 'All Uploaded'}
         </button>
       </div>
     </ModalWrapper>
@@ -2434,9 +2470,8 @@ function Toggle({ checked, onChange, label, description }) {
         role="switch"
         aria-checked={checked}
         onClick={onChange}
-        className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${
-          checked ? 'bg-pink-500' : 'bg-slate-200 dark:bg-slate-700'
-        }`}
+        className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${checked ? 'bg-pink-500' : 'bg-slate-200 dark:bg-slate-700'
+          }`}
       >
         <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
       </button>
@@ -2494,7 +2529,7 @@ function Pagination({ page, totalPages, onPageChange }) {
   const MAX = 5
   const half = Math.floor(MAX / 2)
   let start = Math.max(1, page - half)
-  let end   = Math.min(totalPages, start + MAX - 1)
+  let end = Math.min(totalPages, start + MAX - 1)
   if (end - start + 1 < MAX) start = Math.max(1, end - MAX + 1)
 
   const pages = Array.from({ length: end - start + 1 }, (_, i) => start + i)
@@ -2534,11 +2569,10 @@ function PageBtn({ n, current, onClick }) {
   return (
     <button
       onClick={() => onClick(n)}
-      className={`h-8 min-w-8 rounded-lg px-2 text-sm font-medium transition ${
-        n === current
-          ? 'bg-pink-600 text-white shadow-sm'
-          : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-      }`}
+      className={`h-8 min-w-8 rounded-lg px-2 text-sm font-medium transition ${n === current
+        ? 'bg-pink-600 text-white shadow-sm'
+        : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+        }`}
     >
       {n}
     </button>
