@@ -1,15 +1,9 @@
 'use client'
 
-// Adapted from OJAIN Topbar.jsx → Next.js version.
-// useNavigate()  → useRouter() from next/navigation
-// navigate(path) → router.push(path)
-// useAuth()      → our Zustand-based useAuth hook
-// brand-* colours → pink-* (GoodieGear palette)
-
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
-  Menu, Bell, Search, Sun, Moon, Monitor, Check,
+  Menu, Search,
   Package, ShoppingCart, Star, User, Settings as SettingsIcon,
   LogOut, ChevronDown, CalendarDays,
 } from 'lucide-react'
@@ -19,33 +13,28 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { navItems } from '@/config/navItems'
 
 const NOTIFICATIONS = [
-  { id: 1, icon: ShoppingCart, text: 'New order #ORD-7841 placed',       time: '2m ago',  href: '/admin/orders'   },
-  { id: 2, icon: Package,      text: 'A product is out of stock',         time: '1h ago',  href: '/admin/products' },
-  { id: 3, icon: Star,         text: '2 reviews awaiting moderation',     time: '3h ago',  href: '/admin/reviews'  },
+  { id: 1, icon: ShoppingCart, text: 'New order #ORD-7841 placed', time: '2m ago', href: '/admin/orders' },
+  { id: 2, icon: Package, text: 'A product is out of stock', time: '1h ago', href: '/admin/products' },
+  { id: 3, icon: Star, text: '2 reviews awaiting moderation', time: '3h ago', href: '/admin/reviews' },
 ]
 
-// const THEME_OPTIONS = [
-//   { value: 'light',  label: 'Light',  icon: Sun     },
-//   { value: 'dark',   label: 'Dark',   icon: Moon    },
-//   { value: 'system', label: 'System', icon: Monitor },
-// ]
-
 export default function Topbar({ onMenu }) {
-  const router   = useRouter()
-  const toast    = useToast()
+  const router = useRouter()
+  const toast = useToast()
   const { user, signOut } = useAuth()
   const { choice, isDark, setTheme } = useTheme()
 
-  const [query,       setQuery]       = useState('')
-  const [searchOpen,  setSearchOpen]  = useState(false)
-  const [bellOpen,    setBellOpen]    = useState(false)
-  const [unread,      setUnread]      = useState(true)
-  const [menuOpen,    setMenuOpen]    = useState(false)
-  const [themeOpen,   setThemeOpen]   = useState(false)
+  const [query, setQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [bellOpen, setBellOpen] = useState(false)
+  const [unread, setUnread] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
-  const bellRef   = useRef(null)
-  const menuRef   = useRef(null)
-  const themeRef  = useRef(null)
+  const bellRef = useRef(null)
+  const menuRef = useRef(null)
+  const themeRef = useRef(null)
   const searchRef = useRef(null)
 
   const searchResults = query.trim()
@@ -55,9 +44,9 @@ export default function Topbar({ onMenu }) {
   // Close all dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
-      if (bellRef.current   && !bellRef.current.contains(e.target))   setBellOpen(false)
-      if (menuRef.current   && !menuRef.current.contains(e.target))   setMenuOpen(false)
-      if (themeRef.current  && !themeRef.current.contains(e.target))  setThemeOpen(false)
+      if (bellRef.current && !bellRef.current.contains(e.target)) setBellOpen(false)
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+      if (themeRef.current && !themeRef.current.contains(e.target)) setThemeOpen(false)
       if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false)
     }
     document.addEventListener('mousedown', handler)
@@ -66,8 +55,20 @@ export default function Topbar({ onMenu }) {
 
   const handleSignOut = () => {
     setMenuOpen(false)
-    signOut()
-    toast('Signed out successfully', 'info')
+    setShowLogoutConfirm(true)
+  }
+
+const confirmLogout = async () => {
+  setShowLogoutConfirm(false)
+
+  await signOut()
+
+  toast('Signed out successfully', 'info')
+  router.replace('/login')
+}
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false)
   }
 
   const submitSearch = (e) => {
@@ -147,80 +148,6 @@ export default function Topbar({ onMenu }) {
       </div>
 
       <div className="ml-auto flex items-center gap-1 sm:gap-2">
-        {/* Live clock */}
-        {/* <Clock /> */}
-
-        {/* Theme picker */}
-        {/* <div className="relative" ref={themeRef}>
-          <button
-            onClick={() => setThemeOpen((o) => !o)}
-            title="Change theme"
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-amber-400 dark:hover:bg-slate-800"
-          >
-            {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-          </button>
-          {themeOpen && (
-            <div className="absolute right-0 mt-2 w-40 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-slate-800 dark:bg-slate-900">
-              {THEME_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => pickTheme(opt.value, opt.label)}
-                  className={[
-                    'flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-800',
-                    choice === opt.value
-                      ? 'font-semibold text-pink-600 dark:text-pink-400'
-                      : 'text-slate-600 dark:text-slate-300',
-                  ].join(' ')}
-                >
-                  <opt.icon className="h-4 w-4" />
-                  <span className="flex-1">{opt.label}</span>
-                  {choice === opt.value && <Check className="h-4 w-4" />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div> */}
-
-        {/* Notifications bell */}
-        {/* <div className="relative" ref={bellRef}>
-          <button
-            onClick={openBell}
-            className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-          >
-            <Bell className="h-5 w-5" />
-            {unread && (
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500" />
-            )}
-          </button>
-          {bellOpen && (
-            <div className="absolute right-0 mt-2 w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
-              <div className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 dark:border-slate-800 dark:text-slate-100">
-                Notifications
-              </div>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                {NOTIFICATIONS.map((n) => {
-                  const Icon = n.icon
-                  return (
-                    <button
-                      key={n.id}
-                      onClick={() => { router.push(n.href); setBellOpen(false) }}
-                      className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800"
-                    >
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-900/30 dark:text-pink-300">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <span>
-                        <span className="block text-sm text-slate-700 dark:text-slate-300">{n.text}</span>
-                        <span className="text-xs text-slate-400">{n.time}</span>
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </div> */}
-
         {/* User menu */}
         <div className="relative ml-1" ref={menuRef}>
           <button
@@ -261,12 +188,6 @@ export default function Topbar({ onMenu }) {
               >
                 <User className="h-4 w-4" /> Profile
               </button>
-              {/* <button
-                onClick={() => { setMenuOpen(false); router.push('/admin/settings') }}
-                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                <SettingsIcon className="h-4 w-4" /> Settings
-              </button> */}
               <button
                 onClick={handleSignOut}
                 className="flex w-full items-center gap-2.5 border-t border-slate-100 px-4 py-2.5 text-left text-sm text-rose-600 hover:bg-rose-50 dark:border-slate-800 dark:hover:bg-rose-950/40"
@@ -277,6 +198,35 @@ export default function Topbar({ onMenu }) {
           )}
         </div>
       </div>
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-2xl dark:bg-slate-900">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white">
+              Logout Confirmation
+            </h3>
+
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+              Are you sure you want to logout?
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={cancelLogout}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              >
+                No
+              </button>
+
+              <button
+                onClick={confirmLogout}
+                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700"
+              >
+                Yes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 }
